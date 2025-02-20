@@ -1,9 +1,9 @@
 from datetime import date
 from typing import List, Optional
-from pydantic import BaseModel
+from beanie import Document
 
 
-class Book(BaseModel):
+class Book(Document):
     title: str
     publication_date: date
     language: str
@@ -11,7 +11,7 @@ class Book(BaseModel):
     genre: str
 
 
-class Edition(BaseModel):
+class Edition(Document):
     isbn: str
     price: float
     publisher: str
@@ -21,7 +21,7 @@ class Edition(BaseModel):
     book_id: str
     
 
-class Customer(BaseModel):
+class Customer(Document):
     first_name: str
     last_name: str
     phone_number: str
@@ -29,7 +29,7 @@ class Customer(BaseModel):
     address: str
 
 
-class Employee(BaseModel):
+class Employee(Document):
     first_name: str
     last_name: str
     register_code: int
@@ -37,7 +37,7 @@ class Employee(BaseModel):
     wage: float
 
 
-class SaleItem(BaseModel):
+class SaleItem(Document):
     quantity: int
     discount: float
     is_gift: bool
@@ -45,7 +45,7 @@ class SaleItem(BaseModel):
     edition_id: str
 
 
-class Sale(BaseModel):
+class Sale(Document):
     date: date
     payment_type: str
     customer_id: str
