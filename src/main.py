@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from .database.connection import connect_db, close_db
@@ -8,11 +10,11 @@ from .routes.employee import employee_router
 from .routes.sale import sale_router
 from .routes.sale_item import sale_item_router
 
-DATABASE_URL = "mongodb://localhost:27017"
+load_dotenv()
 
 @asynccontextmanager
 async def db_lifespan(app):
-    await connect_db(DATABASE_URL)
+    await connect_db(os.getenv("DATABASE_URL"))
     yield
     await close_db()
 
