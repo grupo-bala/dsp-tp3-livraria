@@ -1,6 +1,7 @@
 from datetime import date
 from typing import List, Optional
-from beanie import Document
+from beanie import Document, Link
+from pydantic import BaseModel
 
 
 class Book(Document):
@@ -18,8 +19,8 @@ class Edition(Document):
     language: str
     publication_year: int
     stock: int
-    book_id: str
-    
+    book: Link[Book]
+
 
 class Customer(Document):
     first_name: str
@@ -42,12 +43,53 @@ class SaleItem(Document):
     discount: float
     is_gift: bool
     notes: Optional[str]
-    edition_id: str
+    edition: Link[Edition]
 
 
 class Sale(Document):
     date: date
     payment_type: str
-    customer_id: str
-    employee_id: str
-    items: List[SaleItem]
+    customer: Link[Customer]
+    employee: Link[Employee]
+    items: List[Link[SaleItem]]
+
+
+class SalesInTimeWindow(BaseModel):
+    total: float
+    total_quantity: int
+
+    class Settings:
+        projection = {
+            "total": {
+                "$sum": {
+                    "$map": {
+                        "input": "$items",
+                        "as": "item",
+                        "in": {
+                            "$multiply": [
+                                "$$item.quantity",
+                                {
+                                    "$divide": [
+                                        {"$subtract": [100, "$$item.discount"]},
+                                        100,
+                                    ]
+                                },
+                                "$$item.edition.price",
+                            ]
+                        },
+                    }
+                }
+            },
+            "total_quantity": {
+                "$sum": {
+                    "$map": {"input": "$items", "as": "item", "in": "$$item.quantity"}
+                }
+            },
+        }
+
+
+class EditionsPriceSum(BaseModel):
+    total: float
+
+    class Settings:
+        projection = {"total": {"$sum": "$price"}}
