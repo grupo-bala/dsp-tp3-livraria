@@ -5,6 +5,7 @@ from .utils import get_response_object, generate_filters
 
 customer_router = APIRouter(prefix="/customers", tags=["Customers"])
 
+
 @customer_router.post("")
 async def create_customer(customer: Customer):
     return {"data": await customer.insert()}
@@ -29,7 +30,7 @@ async def get_customers(
     if sort_by:
         sort_direction = 1 if sort_order == "asc" else -1
         query = query.sort((sort_by, sort_direction))
-    
+
     total_count = await query.count()
     customers = await query.skip((page - 1) * size).limit(size).to_list()
 

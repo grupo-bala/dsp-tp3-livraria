@@ -12,11 +12,13 @@ from .routes.sale_item import sale_item_router
 
 load_dotenv()
 
+
 @asynccontextmanager
 async def db_lifespan(app):
     await connect_db(os.getenv("DATABASE_URL"))
     yield
     await close_db()
+
 
 app = FastAPI(lifespan=db_lifespan)
 

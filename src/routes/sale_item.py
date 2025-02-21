@@ -5,6 +5,7 @@ from .utils import get_response_object, generate_filters
 
 sale_item_router = APIRouter(prefix="/sale-items", tags=["Sale Items"])
 
+
 @sale_item_router.post("")
 async def create_sale_item(sale_item: SaleItem):
     return {"data": await sale_item.insert()}
@@ -29,7 +30,7 @@ async def get_sale_items(
     if sort_by:
         sort_direction = 1 if sort_order == "asc" else -1
         query = query.sort((sort_by, sort_direction))
-    
+
     total_count = await query.count()
     sale_items = await query.skip((page - 1) * size).limit(size).to_list()
 

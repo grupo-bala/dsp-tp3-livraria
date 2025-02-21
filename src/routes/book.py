@@ -5,6 +5,7 @@ from .utils import get_response_object, generate_filters
 
 book_router = APIRouter(prefix="/books", tags=["Books"])
 
+
 @book_router.post("")
 async def create_book(book: Book):
     return {"data": await book.insert()}
@@ -28,7 +29,7 @@ async def get_books(
     if sort_by:
         sort_direction = 1 if sort_order == "asc" else -1
         query = query.sort((sort_by, sort_direction))
-    
+
     total_count = await query.count()
     books = await query.skip((page - 1) * size).limit(size).to_list()
 
