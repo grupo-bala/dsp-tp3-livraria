@@ -1,9 +1,11 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import Annotated, Optional
-from ..models import Employee
+from ..models import Employee, Sale, SalesInTimeWindow, SaleItem
+from datetime import date
 from .utils import get_response_object, generate_filters
 
 employee_router = APIRouter(prefix="/employees", tags=["Employees"])
+
 
 @employee_router.post("")
 async def create_employee(employee: Employee):
@@ -27,7 +29,7 @@ async def get_employees(
     if sort_by:
         sort_direction = 1 if sort_order == "asc" else -1
         query = query.sort((sort_by, sort_direction))
-    
+
     total_count = await query.count()
     employees = await query.skip((page - 1) * size).limit(size).to_list()
 
@@ -54,3 +56,19 @@ async def delete_employee(id: str):
 
     await employee.delete()
     return {"message": "Employee deleted successfully"}
+
+
+@employee_router.get("/vendas-no-periodo")
+async def time_window_sales(start_date: date, end_date: date):
+    result = (
+        await Sale.find(
+            Sale.date >= start_date, Sale.date <= end_date, fetch_links=True
+        )
+        .project(SalesInTimeWindow)
+        .first_or_none()
+    )
+
+    if result is None:
+        return {"total": 0, "quantity": 0}
+
+    return {"total": result.total, "quantity": result.total_quantity}
